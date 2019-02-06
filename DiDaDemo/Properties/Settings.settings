@@ -1,0 +1,39 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DiDaDemo.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="BootValue" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Defaultlist" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="WindowSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">1300, 800</Value>
+    </Setting>
+    <Setting Name="WindowMaxSize" Type="System.Drawing.Size" Scope="Application">
+      <Value Profile="(Default)">1300, 800</Value>
+    </Setting>
+    <Setting Name="WindowMinSize" Type="System.Drawing.Size" Scope="Application">
+      <Value Profile="(Default)">500, 700</Value>
+    </Setting>
+    <Setting Name="HideEdgeValue" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Name" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">滴答清单</Value>
+    </Setting>
+    <Setting Name="TimedTaskValue" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5000</Value>
+    </Setting>
+    <Setting Name="Timer_AutoSideHide_Interval" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="SideThicknessValue" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">9</Value>
+    </Setting>
+    <Setting Name="WindowSize_Mini" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">500, 800</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

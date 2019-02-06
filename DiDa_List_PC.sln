@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiDa_List_PC", "DiDaDemo\DiDa_List_PC.csproj", "{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}.Debug|x86.ActiveCfg = Debug|x86
+		{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}.Debug|x86.Build.0 = Debug|x86
+		{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}.Release|x86.ActiveCfg = Release|x86
+		{A08187E5-8BD2-43C7-AD38-6DFDDDCC56AF}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6C148619-0AAB-4A70-A412-8BC0D6550B18}
+	EndGlobalSection
+EndGlobal
