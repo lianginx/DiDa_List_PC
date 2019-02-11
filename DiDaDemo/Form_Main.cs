@@ -328,6 +328,7 @@ namespace DiDa_List_PC
 
             Show();
             WindowState = FormWindowState.Normal;
+            Activate();
         }
 
         private void ClosingToHide(object sender, FormClosingEventArgs e)
