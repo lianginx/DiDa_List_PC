@@ -139,5 +139,17 @@ namespace DiDa_List_PC.Properties {
                 this["WindowSize_Mini"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsSetShortcutKey {
+            get {
+                return ((bool)(this["IsSetShortcutKey"]));
+            }
+            set {
+                this["IsSetShortcutKey"] = value;
+            }
+        }
     }
 }

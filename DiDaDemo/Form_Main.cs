@@ -15,18 +15,19 @@ using System.Threading;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Microsoft.Win32;
 using DiDa_List_PC.Properties;
+using System.Runtime.InteropServices;
 
 namespace DiDa_List_PC
 {
     public partial class Form_Main : Form
     {
+        #region 属性/字段
+
         /// <summary>
         /// 启动参数
         /// </summary>
-        string[] Args = null;
-
+        string[] StarArgs = null;
         ChromiumWebBrowser Browser;
-
         /// <summary>
         /// 空任务集合
         /// </summary>
@@ -37,16 +38,22 @@ namespace DiDa_List_PC
                 dateTime = DateTime.Now
             }
         };
-
         /// <summary>
         /// 判断窗体是否激活
         /// </summary>
         bool IsWindowActivate = false;
-
         /// <summary>
         /// 初始网页地址
         /// </summary>
         string StartUrl = string.Empty;
+        /// <summary>
+        /// 全局快捷键ID
+        /// </summary>
+        int ShortcutKeyID = 100;
+
+        #endregion
+
+        #region 方法
 
         public Form_Main(string[] _args)
         {
@@ -54,10 +61,8 @@ namespace DiDa_List_PC
 
             SetControlValue(Settings.Default);
             InitializeCefSharp(StartUrl);
-            Args = _args;
+            StarArgs = _args;
         }
-
-        #region 方法
 
         /// <summary>
         /// 初始化浏览器控件
@@ -250,9 +255,16 @@ namespace DiDa_List_PC
         /// </summary>
         private void SetControlValue(Settings _settings)
         {
-            ShowInTaskbar = _settings.HideEdgeValue ? false : true; // 开启mini模式，任务栏不显示窗体
+            // 开启mini模式，任务栏不显示窗体
+            ShowInTaskbar = _settings.HideEdgeValue ? false : true;
+
+            // 窗体大小
             Size = ShowInTaskbar ? _settings.WindowSize : _settings.WindowSize_Mini;
+
+            // MINI模式
             tsm_Mini.Checked = _settings.HideEdgeValue;
+
+            // 默认清单
             tscb_DefaultList.SelectedIndex = _settings.Defaultlist;
             switch (tscb_DefaultList.SelectedIndex)
             {
@@ -270,6 +282,9 @@ namespace DiDa_List_PC
                     StartUrl = Resources.List_Week;
                     break;
             }
+
+            // 全局快捷键
+            tsm_IsDisableShortcutKey.Checked = _settings.IsSetShortcutKey;
         }
 
         /// <summary>
@@ -293,19 +308,78 @@ namespace DiDa_List_PC
             }
         }
 
+        /// <summary>
+        /// 根据参数注册热键或注销热键
+        /// </summary>
+        /// <param name="_isEnable">是否注册热键</param>
+        private void SetShorcutKey(bool _isEnable)
+        {
+            if (_isEnable)
+            {
+                HotKey.RegisterHotKey(Handle, ShortcutKeyID, HotKey.KeyModifiers.Ctrl | HotKey.KeyModifiers.Alt, Keys.D);
+            }
+            else
+            {
+                HotKey.UnregisterHotKey(Handle, ShortcutKeyID);
+            }
+        }
+
+        /// <summary>
+        /// 获取Windows消息，响应全局快捷键
+        /// </summary>
+        /// <param name="m"></param>
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_HOTKEY = 0x0312;
+            if (m.Msg == WM_HOTKEY || m.HWnd.ToInt32() == ShortcutKeyID)
+            {
+                if (IsWindowActivate)
+                {
+                    SetShowOrHideWindow(false);
+                }
+                else
+                {
+                    SetShowOrHideWindow(true);
+                }
+            }
+            base.WndProc(ref m);
+        }
+
+        /// <summary>
+        /// 设置显示或隐藏窗体
+        /// </summary>
+        /// <param name="_isShow">是否显示窗体</param>
+        private void SetShowOrHideWindow(bool _isShow)
+        {
+            if (_isShow)
+            {
+                // 显示窗体
+                Show();
+                WindowState = FormWindowState.Normal;
+                Activate();
+            }
+            else
+            {
+                // 隐藏窗体
+                WindowState = FormWindowState.Minimized;
+                Thread.Sleep(150);
+                Hide();
+            }
+        }
+
         #endregion
 
-        #region 事件区
+        #region 事件
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //SetControlValue(Settings.Default);
-            //InitializeCefSharp(StartUrl);
+            // 根据托盘图标菜单，注册全局快捷键
+            if (!tsm_IsDisableShortcutKey.Checked) SetShorcutKey(true);
         }
 
         private void Form_Main_Shown(object sender, EventArgs e)
         {
-            SetMinStar(Args);
+            SetMinStar(StarArgs);
         }
 
         private async void Timer1_Tick(object sender, EventArgs e)
@@ -325,20 +399,14 @@ namespace DiDa_List_PC
         private void LeftClickToShow(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left) return;
-
-            Show();
-            WindowState = FormWindowState.Normal;
-            Activate();
+            SetShowOrHideWindow(true);
         }
 
         private void ClosingToHide(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason != CloseReason.UserClosing) return;
-
             e.Cancel = true;
-            WindowState = FormWindowState.Minimized;
-            Thread.Sleep(150);
-            Hide();
+            SetShowOrHideWindow(false);
         }
 
         private void MouseUpToExit(object sender, MouseEventArgs e)
@@ -396,8 +464,29 @@ namespace DiDa_List_PC
             SideHideOrShow(Settings.Default.SideThicknessValue);
         }
 
+        private void tsm_IsDisableShortcutKey_CheckedChanged(object sender, EventArgs e)
+        {
+            if (tsm_IsDisableShortcutKey.Checked)
+            {
+                SetShorcutKey(false);
+            }
+            else
+            {
+                SetShorcutKey(true);
+            }
+        }
+
         #endregion
 
+        /// <summary>
+        /// 任务数据
+        /// </summary>
+        struct TaskData
+        {
+            public string Title;
+            public string Content;
+            public DateTime dateTime;
+        }
     }
 
     /// <summary>
@@ -438,12 +527,49 @@ namespace DiDa_List_PC
     }
 
     /// <summary>
-    /// 任务数据
+    /// 全局快捷键注册与注销
     /// </summary>
-    struct TaskData
+    public class HotKey
     {
-        public string Title;
-        public string Content;
-        public DateTime dateTime;
+        /// <summary>
+        /// 绑定热键
+        /// </summary>
+        /// <param name="hWnd">要定义热键的窗口的句柄</param>
+        /// <param name="id">定义热键ID（不能与其它ID重复） </param>
+        /// <param name="fsModifiers">标识热键是否在按Alt、Ctrl、Shift、Windows等键时才会生效</param>
+        /// <param name="vk">定义热键的内容</param>
+        /// <returns>执行成功返回值不为0，失败返回值为0，要得到扩展错误信息，调用GetLastError</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool RegisterHotKey(
+            IntPtr hWnd,
+            int id,
+            KeyModifiers fsModifiers,
+            Keys vk
+            );
+
+        /// <summary>
+        /// 取消热键绑定
+        /// </summary>
+        /// <param name="hWnd">要取消热键的窗口的句柄</param>
+        /// <param name="id">要取消热键的ID</param>
+        /// <returns>执行成功返回值不为0，失败返回值为0，要得到扩展错误信息，调用GetLastError</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool UnregisterHotKey(
+            IntPtr hWnd,
+            int id
+            );
+
+        /// <summary>
+        /// 定义了辅助键的名称（将数字转变为字符以便于记忆，也可去除此枚举而直接使用数值）
+        /// </summary>
+        [Flags()]
+        public enum KeyModifiers
+        {
+            None = 0,
+            Alt = 1,
+            Ctrl = 2,
+            Shift = 4,
+            WindowsKey = 8
+        }
     }
 }
