@@ -16,6 +16,7 @@ using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Microsoft.Win32;
 using DiDa_List_PC.Properties;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace DiDa_List_PC
 {
@@ -27,7 +28,9 @@ namespace DiDa_List_PC
         /// 启动参数
         /// </summary>
         string[] StarArgs = null;
+
         ChromiumWebBrowser Browser;
+
         /// <summary>
         /// 空任务集合
         /// </summary>
@@ -38,14 +41,17 @@ namespace DiDa_List_PC
                 dateTime = DateTime.Now
             }
         };
+
         /// <summary>
         /// 判断窗体是否激活
         /// </summary>
         bool IsWindowActivate = false;
+
         /// <summary>
         /// 初始网页地址
         /// </summary>
         string StartUrl = string.Empty;
+
         /// <summary>
         /// 全局快捷键ID
         /// </summary>
@@ -57,10 +63,14 @@ namespace DiDa_List_PC
 
         public Form_Main(string[] _args)
         {
+            DisableDuplicateStartup();
+
             InitializeComponent();
 
             SetControlValue(Settings.Default);
+
             InitializeCefSharp(StartUrl);
+
             StarArgs = _args;
         }
 
@@ -367,6 +377,19 @@ namespace DiDa_List_PC
             }
         }
 
+        /// <summary>
+        /// 禁止重复启动
+        /// </summary>
+        private static void DisableDuplicateStartup()
+        {
+            string processName = Process.GetCurrentProcess().ProcessName;
+            Process[] processes = Process.GetProcessesByName(processName);
+            if (processes.Length > 1)
+            {
+                Environment.Exit(0);
+            }
+        }
+
         #endregion
 
         #region 事件
@@ -374,7 +397,7 @@ namespace DiDa_List_PC
         private void Form1_Load(object sender, EventArgs e)
         {
             // 根据托盘图标菜单，注册全局快捷键
-            if (!tsm_IsDisableShortcutKey.Checked) SetShorcutKey(true);
+            SetShorcutKey(!tsm_IsDisableShortcutKey.Checked);
         }
 
         private void Form_Main_Shown(object sender, EventArgs e)
@@ -466,6 +489,7 @@ namespace DiDa_List_PC
 
         private void tsm_IsDisableShortcutKey_CheckedChanged(object sender, EventArgs e)
         {
+            // 是否禁用全局快捷键
             if (tsm_IsDisableShortcutKey.Checked)
             {
                 SetShorcutKey(false);
