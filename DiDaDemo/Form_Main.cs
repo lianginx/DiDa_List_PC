@@ -23,91 +23,73 @@ using System.Runtime.CompilerServices;
 
 namespace DiDa_List_PC
 {
-    public partial class Form_Main : Form
+    public partial class FormMain : Form
     {
         #region 属性/字段
 
-        /// <summary>
-        /// 启动参数
-        /// </summary>
-        string[] StarArgs = null;
-
-        ChromiumWebBrowser Browser;
-
-        /// <summary>
-        /// 空任务集合
-        /// </summary>
-        List<TaskData> HistoryTasks = new List<TaskData>() {
-            new TaskData() {
+        private const int ShortcutKeyId = 100;
+        private readonly string[] _starArgs;
+        private ChromiumWebBrowser _browser;
+        private bool _isWindowActivate;
+        private string _startUrl = string.Empty;
+        private List<TaskData> _historyTasks = new List<TaskData>
+        {
+            new TaskData
+            {
                 Title = string.Empty,
                 Content = string.Empty,
                 DateTime = DateTime.Now
             }
         };
 
-        /// <summary>
-        /// 判断窗体是否激活
-        /// </summary>
-        bool IsWindowActivate = false;
-
-        /// <summary>
-        /// 初始网页地址
-        /// </summary>
-        string StartUrl = string.Empty;
-
-        /// <summary>
-        /// 全局快捷键ID
-        /// </summary>
-        int ShortcutKeyID = 100;
-
         #endregion
 
         #region 方法
 
-        public Form_Main(string[] _args)
+        public FormMain(string[] args)
         {
             DisableDuplicateStartup();
             InitializeComponent();
             SetControlValue(Settings.Default);
-            InitializeCefSharp(StartUrl);
-            StarArgs = _args;
+            InitializeCefSharp(_startUrl);
+            _starArgs = args;
         }
 
         /// <summary>
         /// 初始化浏览器控件
         /// </summary>
-        /// <param name="_url">初始地址</param>
-        private void InitializeCefSharp(string _url)
+        /// <param name="url">初始地址</param>
+        private void InitializeCefSharp(string url)
         {
             // 初始化设置
-            CefSettings Settings = new CefSettings
+            var settings = new CefSettings
             {
                 CachePath = Application.StartupPath + @"\Cache",
                 Locale = "zh-CN"
             };
-            Cef.Initialize(Settings);
+            Cef.Initialize(settings);
 
             // 初始化浏览器
-            Browser = new ChromiumWebBrowser(_url)
+            _browser = new ChromiumWebBrowser(url)
             {
                 MenuHandler = new MenuHandler(),
                 DragHandler = new DragHandler()
             };
-            Controls.Add(Browser);
+            Controls.Add(_browser);
 
             //加载完成后事件
-            Browser.FrameLoadEnd += Browser_FrameLoadEnd;
+            _browser.FrameLoadEnd += Browser_FrameLoadEnd;
         }
 
-        private List<TaskData> GetTaskDatas(string _html)
+        private static List<TaskData> GetTaskDatas(string html)
         {
             var tasks = new List<TaskData>();
-            var taskListXPath = "//*[@id=\"reminders-modal\"]/ul/li";
-            var taskXPath = "/div/div[2]/div/div[1]/div[1]";
-            var contentXPath = "/div/div[2]/div/div[1]/div[2]";
+            const string taskListXPath = "//*[@id=\"reminders-modal\"]/ul/li";
+            const string taskXPath = "/div/div[2]/div/div[1]/div[1]";
+            const string contentXPath = "/div/div[2]/div/div[1]/div[2]";
 
             var doc = new HtmlDocument();
-            doc.LoadHtml(_html);
+            doc.LoadHtml(html);
             var nodes = doc.DocumentNode.SelectNodes(taskListXPath);
 
             if (nodes == null) return null;
@@ -117,8 +99,7 @@ namespace DiDa_List_PC
                 var xpath = node.XPath;
                 var title = node.SelectSingleNode($"{xpath}{taskXPath}").InnerText;
                 var content = node.SelectSingleNode($"{xpath}{contentXPath}").InnerText;
-
-                tasks.Add(new TaskData()
+                tasks.Add(new TaskData
                 {
                     Title = title,
                     Content = content,
@@ -131,63 +112,60 @@ namespace DiDa_List_PC
         /// <summary>
         /// 对比新旧任务列是否重复，如未重复或时间大于通知周期则发送通知
         /// </summary>
-        /// <param name="_newTasks">刚获取的新任务集合</param>
-        /// <param name="_oldTasks">上次获取的任务集合</param>
-        /// <param name="_tick">通知周期（单位为：秒）</param>
+        /// <param name="newTasks">刚获取的新任务集合</param>
+        /// <param name="oldTasks">上次获取的任务集合</param>
+        /// <param name="tick">通知周期（单位为：秒）</param>
         /// <returns>返回一个任务集合，传入的旧任务集合为null或与新集合不同或与新集合相同但时间大于对比周期，则返回新集合并发送通知，否则返回旧集合</returns>
-        private List<TaskData> EqualsTasks(List<TaskData> _newTasks, List<TaskData> _oldTasks, int _tick)
+        private List<TaskData> EqualsTasks(List<TaskData> newTasks, List<TaskData> oldTasks, int tick)
         {
-            if (_newTasks == null) return _oldTasks;
+            if (newTasks == null) return oldTasks;
 
             var trigger = false;
-
-            foreach (var newD in _newTasks)
+            foreach (var newD in newTasks)
             {
-                foreach (var oldD in _oldTasks)
+                foreach (var oldD in oldTasks)
                 {
-                    if (newD.Title != oldD.Title || newD.Content != oldD.Content || (newD.DateTime - oldD.DateTime).TotalSeconds > _tick)
-                    {
-                        notifyIcon1.ShowBalloonTip(3000, newD.Title, newD.Content == "" ? newD.Title : newD.Content, ToolTipIcon.Info);
-                        trigger = true;
-                    }
+                    if (newD.Title == oldD.Title && newD.Content == oldD.Content &&
+                        !((newD.DateTime - oldD.DateTime).TotalSeconds > tick)) continue;
+                    notifyIcon1.ShowBalloonTip(3000, newD.Title, newD.Content == "" ? newD.Title : newD.Content, ToolTipIcon.Info);
+                    trigger = true;
                 }
             }
-
-            return trigger ? _newTasks : _oldTasks;
+            return trigger ? newTasks : oldTasks;
         }
 
         /// <summary>
         /// 窗体未激活情况下，进行周期性同步操作
         /// </summary>
-        /// <param name="_isWindowActivate">窗体是否激活</param>
-        private void UpdateData(bool _isWindowActivate)
+        /// <param name="isWindowActivate">窗体是否激活</param>
+        private void UpdateData(bool isWindowActivate)
         {
-            if (!_isWindowActivate)
+            if (!isWindowActivate)
             {
-                Browser.ExecuteScriptAsync(Resources.Update_JS);
+                _browser.ExecuteScriptAsync(Resources.Update_JS);
             }
         }
 
         /// <summary>
         /// 如果窗体离屏幕边缘很近，则停靠在该边缘
         /// </summary>
-        /// <param name="_sideThickness">距边缘的距离</param>
-        private void SideDock(int _sideThickness)
+        /// <param name="sideThickness">距边缘的距离</param>
+        private void SideDock(int sideThickness)
         {
             //如果窗体离屏幕边缘很近，则自动停靠在该边缘
-            if (Top <= _sideThickness)
+            if (Top <= sideThickness)
             {
                 Top = 0;
                 TopMost = false;
                 Activate();
             }
-            if (Left <= _sideThickness)
+            if (Left <= sideThickness)
             {
                 Left = 0;
                 TopMost = false;
                 Activate();
             }
-            if (Left >= Screen.PrimaryScreen.WorkingArea.Width - Width - _sideThickness)
+            if (Left >= Screen.PrimaryScreen.WorkingArea.Width - Width - sideThickness)
             {
                 Left = Screen.PrimaryScreen.WorkingArea.Width - Width;
                 TopMost = false;
@@ -198,15 +176,15 @@ namespace DiDa_List_PC
         /// <summary>
         /// 侧边停靠，并隐藏至侧边缘
         /// </summary>
-        /// <param name="_sideThickness">边缘的厚度，窗体停靠在边缘隐藏后留出来的可见部分的厚度</param>
-        void SideHideOrShow(int _sideThickness)
+        /// <param name="sideThickness">边缘的厚度，窗体停靠在边缘隐藏后留出来的可见部分的厚度</param>
+        private void SideHideOrShow(int sideThickness)
         {
             if (WindowState == FormWindowState.Minimized || WindowState == FormWindowState.Maximized) return;
 
             //如果鼠标在窗体内
             if (Cursor.Position.X >= Left && Cursor.Position.X < Right && Cursor.Position.Y >= Top && Cursor.Position.Y < Bottom)
             {
-                SideDock(_sideThickness);
+                SideDock(sideThickness);
             }
             //当鼠标离开窗体以后
             else
@@ -214,19 +192,19 @@ namespace DiDa_List_PC
                 //隐藏到屏幕左边缘
                 if (Left == 0)
                 {
-                    Left = _sideThickness - Width;
+                    Left = sideThickness - Width;
                     TopMost = true;
                 }
                 //隐藏到屏幕右边缘
                 else if (Left == Screen.PrimaryScreen.WorkingArea.Width - Width)
                 {
-                    Left = Screen.PrimaryScreen.WorkingArea.Width - _sideThickness;
+                    Left = Screen.PrimaryScreen.WorkingArea.Width - sideThickness;
                     TopMost = true;
                 }
                 //隐藏到屏幕上边缘
                 else if (Top == 0 && Left > 0 && Left < Screen.PrimaryScreen.WorkingArea.Width - Width)
                 {
-                    Top = _sideThickness - Height;
+                    Top = sideThickness - Height;
                     TopMost = true;
                 }
             }
@@ -235,76 +213,76 @@ namespace DiDa_List_PC
         /// <summary>
         /// 设置或取消开机启动
         /// </summary>
-        /// <param name="_isBoot">是否开机启动</param>
-        private void SetBoot(bool _isBoot)
+        /// <param name="isBoot">是否开机启动</param>
+        private static void SetBoot(bool isBoot)
         {
             var subkey = Resources.Name;
 
-            RegistryKey RKey = Registry.CurrentUser.CreateSubKey(Resources.Registry_Subkey);
-            try
+            using (var rKey = Registry.CurrentUser.CreateSubKey(Resources.Registry_Subkey))
             {
-                if (_isBoot && RKey.GetValue(subkey) == null)
+                try
                 {
-                    // 添加到 当前登陆用户的 注册表启动项
-                    RKey.SetValue(subkey, Application.ExecutablePath + " -m");
+                    if (isBoot && rKey?.GetValue(subkey) == null)
+                    {
+                        rKey?.SetValue(subkey, Application.ExecutablePath + " -m");
+                    }
+                    else
+                    {
+                        rKey?.DeleteValue(subkey, false);
+                    }
                 }
-                else
+                finally
                 {
-                    RKey.DeleteValue(subkey, false);
+                    rKey?.Close();
                 }
-            }
-            finally
-            {
-                RKey.Close();
             }
         }
 
         /// <summary>
         /// 读取配置文件设置控件参数
         /// </summary>
-        private void SetControlValue(Settings _settings)
+        private void SetControlValue(Settings settings)
         {
             // 开启mini模式，任务栏不显示窗体
-            ShowInTaskbar = _settings.HideEdgeValue ? false : true;
+            ShowInTaskbar = !settings.HideEdgeValue;
 
             // 窗体大小
-            Size = ShowInTaskbar ? _settings.WindowSize : _settings.WindowSize_Mini;
+            Size = ShowInTaskbar ? settings.WindowSize : settings.WindowSize_Mini;
 
             // MINI模式
-            tsm_Mini.Checked = _settings.HideEdgeValue;
+            tsm_Mini.Checked = settings.HideEdgeValue;
 
             // 默认清单
-            tscb_DefaultList.SelectedIndex = _settings.Defaultlist;
+            tscb_DefaultList.SelectedIndex = settings.Defaultlist;
             switch (tscb_DefaultList.SelectedIndex)
             {
                 default:
-                case 0:
-                    StartUrl = Resources.List_Tasks;
+                    _startUrl = Resources.List_Tasks;
                     break;
                 case 1:
-                    StartUrl = Resources.List_Today;
+                    _startUrl = Resources.List_Today;
                     break;
                 case 2:
-                    StartUrl = Resources.List_Tomorrow;
+                    _startUrl = Resources.List_Tomorrow;
                     break;
                 case 3:
-                    StartUrl = Resources.List_Week;
+                    _startUrl = Resources.List_Week;
                     break;
             }
 
             // 全局快捷键
-            tsm_IsDisableShortcutKey.Checked = _settings.IsSetShortcutKey;
+            tsm_IsDisableShortcutKey.Checked = settings.IsSetShortcutKey;
         }
 
         /// <summary>
         /// 传入启动参数设置最小化启动
         /// </summary>
-        /// <param name="_args"></param>
-        private void SetMinStar(string[] _args)
+        /// <param name="args"></param>
+        private void SetMinStar(string[] args)
         {
-            if (_args == null) return;
+            if (args == null) return;
 
-            foreach (var arg in _args)
+            foreach (var arg in args)
             {
                 switch (arg)
                 {
@@ -318,36 +296,30 @@ namespace DiDa_List_PC
         /// <summary>
         /// 根据参数注册热键或注销热键
         /// </summary>
-        /// <param name="_isEnable">是否注册热键</param>
-        private void SetShorcutKey(bool _isEnable)
+        /// <param name="isEnable">是否注册热键</param>
+        private void SetShortcutKey(bool isEnable)
         {
-            if (_isEnable)
+            if (isEnable)
             {
-                HotKey.RegisterHotKey(Handle, ShortcutKeyID, HotKey.KeyModifiers.Ctrl | HotKey.KeyModifiers.Alt, Keys.D);
+                HotKey.RegisterHotKey(Handle, ShortcutKeyId, HotKey.KeyModifiers.Ctrl | HotKey.KeyModifiers.Alt, Keys.D);
             }
             else
             {
-                HotKey.UnregisterHotKey(Handle, ShortcutKeyID);
+                HotKey.UnregisteredHotKey(Handle, ShortcutKeyId);
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// 获取Windows消息，响应全局快捷键
         /// </summary>
         /// <param name="m"></param>
         protected override void WndProc(ref Message m)
         {
-            const int WM_HOTKEY = 0x0312;
-            if (m.Msg == WM_HOTKEY || m.HWnd.ToInt32() == ShortcutKeyID)
+            const int hotKey = 0x0312;
+            if (m.Msg == hotKey || m.HWnd.ToInt32() == ShortcutKeyId)
             {
-                if (IsWindowActivate)
-                {
-                    SetShowOrHideWindow(false);
-                }
-                else
-                {
-                    SetShowOrHideWindow(true);
-                }
+                SetShowOrHideWindow(!_isWindowActivate);
             }
             base.WndProc(ref m);
         }
@@ -355,10 +327,10 @@ namespace DiDa_List_PC
         /// <summary>
         /// 设置显示或隐藏窗体
         /// </summary>
-        /// <param name="_isShow">是否显示窗体</param>
-        private void SetShowOrHideWindow(bool _isShow)
+        /// <param name="isShow">是否显示窗体</param>
+        private void SetShowOrHideWindow(bool isShow)
         {
-            if (_isShow)
+            if (isShow)
             {
                 // 显示窗体
                 Show();
@@ -379,8 +351,8 @@ namespace DiDa_List_PC
         /// </summary>
         private static void DisableDuplicateStartup()
         {
-            string processName = Process.GetCurrentProcess().ProcessName;
-            Process[] processes = Process.GetProcessesByName(processName);
+            var processName = Process.GetCurrentProcess().ProcessName;
+            var processes = Process.GetProcessesByName(processName);
             if (processes.Length > 1)
             {
                 Environment.Exit(0);
@@ -411,22 +383,22 @@ namespace DiDa_List_PC
 
         private async void Form1_Load(object sender, EventArgs e)
         {
-            SetShorcutKey(!tsm_IsDisableShortcutKey.Checked);
+            SetShortcutKey(!tsm_IsDisableShortcutKey.Checked);
             await GetVersionUpdate();
         }
 
         private void Form_Main_Shown(object sender, EventArgs e)
         {
-            SetMinStar(StarArgs);
+            SetMinStar(_starArgs);
         }
 
         private async void Timer1_Tick(object sender, EventArgs e)
         {
             // 任务通知
-            var newTaskDatas = GetTaskDatas(await Browser.GetSourceAsync());
-            HistoryTasks = EqualsTasks(newTaskDatas, HistoryTasks, 60);
+            var newTaskDatas = GetTaskDatas(await _browser.GetSourceAsync());
+            _historyTasks = EqualsTasks(newTaskDatas, _historyTasks, 60);
 
-            UpdateData(IsWindowActivate);
+            UpdateData(_isWindowActivate);
         }
 
         private void Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
@@ -456,12 +428,12 @@ namespace DiDa_List_PC
 
         private void Form1_Activated(object sender, EventArgs e)
         {
-            IsWindowActivate = true;
+            _isWindowActivate = true;
         }
 
         private void Form1_Deactivate(object sender, EventArgs e)
         {
-            IsWindowActivate = false;
+            _isWindowActivate = false;
         }
 
         private void ToolStripMenuItem2_CheckedChanged(object sender, EventArgs e)
@@ -502,17 +474,10 @@ namespace DiDa_List_PC
             SideHideOrShow(Settings.Default.SideThicknessValue);
         }
 
-        private void tsm_IsDisableShortcutKey_CheckedChanged(object sender, EventArgs e)
+        private void Tsm_IsDisableShortcutKey_CheckedChanged(object sender, EventArgs e)
         {
             // 是否禁用全局快捷键
-            if (tsm_IsDisableShortcutKey.Checked)
-            {
-                SetShorcutKey(false);
-            }
-            else
-            {
-                SetShorcutKey(true);
-            }
+            SetShortcutKey(!tsm_IsDisableShortcutKey.Checked);
         }
 
         #endregion
@@ -528,6 +493,7 @@ namespace DiDa_List_PC
         }
     }
 
+    /// <inheritdoc />
     /// <summary>
     /// 屏蔽右键菜单
     /// </summary>
@@ -550,6 +516,7 @@ namespace DiDa_List_PC
         }
     }
 
+    /// <inheritdoc />
     /// <summary>
     /// 屏蔽拖拽放置
     /// </summary> 
@@ -593,7 +560,7 @@ namespace DiDa_List_PC
         /// <param name="id">要取消热键的ID</param>
         /// <returns>执行成功返回值不为0，失败返回值为0，要得到扩展错误信息，调用GetLastError</returns>
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern bool UnregisterHotKey(
+        public static extern bool UnregisteredHotKey(
             IntPtr hWnd,
             int id
             );
@@ -601,7 +568,7 @@ namespace DiDa_List_PC
         /// <summary>
         /// 定义了辅助键的名称（将数字转变为字符以便于记忆，也可去除此枚举而直接使用数值）
         /// </summary>
-        [Flags()]
+        [Flags]
         public enum KeyModifiers
         {
             None = 0,

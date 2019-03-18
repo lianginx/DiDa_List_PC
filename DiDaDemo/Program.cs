@@ -16,7 +16,7 @@ namespace DiDa_List_PC
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form_Main(args));
+            Application.Run(new FormMain(args));
         }
     }
 }

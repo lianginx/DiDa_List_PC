@@ -1,6 +1,6 @@
 ﻿namespace DiDa_List_PC
 {
-    partial class Form_Main
+    partial class FormMain
     {
         /// <summary>
         /// 必需的设计器变量。
@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_Main));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsm_Open = new System.Windows.Forms.ToolStripMenuItem();
@@ -101,7 +101,7 @@
             this.tsm_IsDisableShortcutKey.ShowShortcutKeys = false;
             this.tsm_IsDisableShortcutKey.Size = new System.Drawing.Size(197, 24);
             this.tsm_IsDisableShortcutKey.Text = "禁用快捷键";
-            this.tsm_IsDisableShortcutKey.CheckedChanged += new System.EventHandler(this.tsm_IsDisableShortcutKey_CheckedChanged);
+            this.tsm_IsDisableShortcutKey.CheckedChanged += new System.EventHandler(this.Tsm_IsDisableShortcutKey_CheckedChanged);
             // 
             // toolStripSeparator2
             // 
@@ -172,7 +172,7 @@
             this.MaximizeBox = false;
             this.MaximumSize = global::DiDa_List_PC.Properties.Settings.Default.WindowMaxSize;
             this.MinimumSize = global::DiDa_List_PC.Properties.Settings.Default.WindowMinSize;
-            this.Name = "Form_Main";
+            this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = global::DiDa_List_PC.Properties.Settings.Default.Name;
             this.Activated += new System.EventHandler(this.Form1_Activated);
