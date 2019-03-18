@@ -17,6 +17,9 @@ using Microsoft.Win32;
 using DiDa_List_PC.Properties;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Net;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace DiDa_List_PC
 {
@@ -38,7 +41,7 @@ namespace DiDa_List_PC
             new TaskData() {
                 Title = string.Empty,
                 Content = string.Empty,
-                dateTime = DateTime.Now
+                DateTime = DateTime.Now
             }
         };
 
@@ -64,13 +67,9 @@ namespace DiDa_List_PC
         public Form_Main(string[] _args)
         {
             DisableDuplicateStartup();
-
             InitializeComponent();
-
             SetControlValue(Settings.Default);
-
             InitializeCefSharp(StartUrl);
-
             StarArgs = _args;
         }
 
@@ -123,7 +122,7 @@ namespace DiDa_List_PC
                 {
                     Title = title,
                     Content = content,
-                    dateTime = DateTime.Now
+                    DateTime = DateTime.Now
                 });
             }
             return tasks;
@@ -146,7 +145,7 @@ namespace DiDa_List_PC
             {
                 foreach (var oldD in _oldTasks)
                 {
-                    if (newD.Title != oldD.Title || newD.Content != oldD.Content || (newD.dateTime - oldD.dateTime).TotalSeconds > _tick)
+                    if (newD.Title != oldD.Title || newD.Content != oldD.Content || (newD.DateTime - oldD.DateTime).TotalSeconds > _tick)
                     {
                         notifyIcon1.ShowBalloonTip(3000, newD.Title, newD.Content == "" ? newD.Title : newD.Content, ToolTipIcon.Info);
                         trigger = true;
@@ -310,9 +309,7 @@ namespace DiDa_List_PC
                 switch (arg)
                 {
                     case "-m":
-                        ClosingToHide(null, new FormClosingEventArgs(CloseReason.UserClosing, false));
-                        break;
-                    default:
+                        SetShowOrHideWindow(false);
                         break;
                 }
             }
@@ -390,14 +387,32 @@ namespace DiDa_List_PC
             }
         }
 
+        /// <summary>
+        /// 获取版本更新
+        /// </summary>
+        private async Task GetVersionUpdate()
+        {
+            const string githubUrl = "https://github.com/niujunliang/DiDa_List_PC/releases";
+            const string xpath = "/html/body/div[4]/div/main/div[2]/div[1]/div[3]/div[1]/div/div[1]/ul/li[1]/a";
+
+            var text = await new WebClient().DownloadStringTaskAsync(githubUrl);
+            var doc = new HtmlDocument();
+            doc.LoadHtml(text);
+            var githubTag = doc.DocumentNode.SelectSingleNode(xpath).InnerText.Trim();
+            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+            if (version.Equals($@"{githubTag.TrimStart('v')}.0")) return;
+            notifyIcon1.ShowBalloonTip(1, "更新提醒", $"GitHub 上有新的版本: {githubTag}", ToolTipIcon.Info);
+        }
+
         #endregion
 
         #region 事件
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
-            // 根据托盘图标菜单，注册全局快捷键
             SetShorcutKey(!tsm_IsDisableShortcutKey.Checked);
+            await GetVersionUpdate();
         }
 
         private void Form_Main_Shown(object sender, EventArgs e)
@@ -505,11 +520,11 @@ namespace DiDa_List_PC
         /// <summary>
         /// 任务数据
         /// </summary>
-        struct TaskData
+        private struct TaskData
         {
             public string Title;
             public string Content;
-            public DateTime dateTime;
+            public DateTime DateTime;
         }
     }
 
