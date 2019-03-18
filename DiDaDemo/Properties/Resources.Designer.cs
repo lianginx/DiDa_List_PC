@@ -115,7 +115,10 @@ namespace DiDa_List_PC.Properties {
         }
         
         /// <summary>
-        ///   查找类似 document.getElementById(&apos;refresh&apos;).click(); 的本地化字符串。
+        ///   查找类似 
+        ///      document.getElementsByClassName(&quot;avatar&quot;)[0].click();
+        ///      document.getElementsByClassName(&quot;dropdown-menu-menu-item&quot;)[0].click();
+        ///     的本地化字符串。
         /// </summary>
         internal static string Update_JS {
             get {

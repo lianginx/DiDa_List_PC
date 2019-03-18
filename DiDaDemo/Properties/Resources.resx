@@ -141,7 +141,11 @@
     <comment>注册表Run目录</comment>
   </data>
   <data name="Update_JS" xml:space="preserve">
-    <value>document.getElementById('refresh').click();</value>
+    <!--<value>document.getElementById('refresh').click();</value>-->
+    <value>
+      document.getElementsByClassName("avatar")[0].click();
+      document.getElementsByClassName("dropdown-menu-menu-item")[0].click();
+    </value>
     <comment>点击“同步”按钮的JS语句</comment>
   </data>
 </root>
