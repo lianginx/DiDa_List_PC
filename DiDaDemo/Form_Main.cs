@@ -364,8 +364,8 @@ namespace DiDa_List_PC
         /// </summary>
         private async Task GetVersionUpdate()
         {
-            const string githubUrl = "https://github.com/niujunliang/DiDa_List_PC/releases";
-            const string xpath = "/html/body/div[4]/div/main/div[2]/div[1]/div[3]/div[1]/div/div[1]/ul/li[1]/a";
+            var githubUrl = Settings.Default.GithubUrl;
+            var xpath = Settings.Default.GitHubVersionXPath;
 
             var text = await new WebClient().DownloadStringTaskAsync(githubUrl);
             var doc = new HtmlDocument();

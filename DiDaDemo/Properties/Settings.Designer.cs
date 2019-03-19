@@ -151,5 +151,29 @@ namespace DiDa_List_PC.Properties {
                 this["IsSetShortcutKey"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("//div[@class=\'release-entry\'][1]/div/div[1]/ul/li[1]/a")]
+        public string GitHubVersionXPath {
+            get {
+                return ((string)(this["GitHubVersionXPath"]));
+            }
+            set {
+                this["GitHubVersionXPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://github.com/niujunliang/DiDa_List_PC/releases")]
+        public string GithubUrl {
+            get {
+                return ((string)(this["GithubUrl"]));
+            }
+            set {
+                this["GithubUrl"] = value;
+            }
+        }
     }
 }

@@ -38,5 +38,11 @@
     <Setting Name="IsSetShortcutKey" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="GitHubVersionXPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">//div[@class='release-entry'][1]/div/div[1]/ul/li[1]/a</Value>
+    </Setting>
+    <Setting Name="GithubUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://github.com/niujunliang/DiDa_List_PC/releases</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
