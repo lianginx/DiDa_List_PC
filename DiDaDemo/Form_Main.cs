@@ -49,7 +49,6 @@ namespace DiDa_List_PC
 
         public FormMain(string[] args)
         {
-            DisableDuplicateStartup();
             InitializeComponent();
             SetControlValue(Settings.Default);
             InitializeCefSharp(StartUrl);
@@ -348,7 +347,7 @@ namespace DiDa_List_PC
         }
 
         /// <summary>
-        /// 禁止重复启动
+        /// 禁止重复启动（只能放在Load事件中）
         /// </summary>
         private static void DisableDuplicateStartup()
         {
@@ -384,8 +383,9 @@ namespace DiDa_List_PC
 
         private async void Form1_Load(object sender, EventArgs e)
         {
-            SetShortcutKey(!tsm_IsDisableShortcutKey.Checked);
+            DisableDuplicateStartup();
             await GetVersionUpdate();
+            SetShortcutKey(!tsm_IsDisableShortcutKey.Checked);
         }
 
         private void Form_Main_Shown(object sender, EventArgs e)
