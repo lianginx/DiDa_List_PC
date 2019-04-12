@@ -29,28 +29,48 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+            System.Windows.Forms.ToolStripSeparator _4;
+            System.Windows.Forms.ToolStripSeparator _1;
+            System.Windows.Forms.ToolStripSeparator _2;
+            System.Windows.Forms.ToolStripSeparator _3;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsm_Open = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsm_IsDisableShortcutKey = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsm_Reload = new System.Windows.Forms.ToolStripMenuItem();
             this.tscb_DefaultList = new System.Windows.Forms.ToolStripComboBox();
             this.tsm_Mini = new System.Windows.Forms.ToolStripMenuItem();
             this.tsm_Boot = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_IsDisableShortcutKey = new System.Windows.Forms.ToolStripMenuItem();
             this.tsm_Exit = new System.Windows.Forms.ToolStripMenuItem();
             this.t_TimedTask = new System.Windows.Forms.Timer(this.components);
             this.t_AutoSideHideOrShow = new System.Windows.Forms.Timer(this.components);
-            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            _4 = new System.Windows.Forms.ToolStripSeparator();
+            _1 = new System.Windows.Forms.ToolStripSeparator();
+            _2 = new System.Windows.Forms.ToolStripSeparator();
+            _3 = new System.Windows.Forms.ToolStripSeparator();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // toolStripSeparator1
+            // _4
             // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(194, 6);
+            _4.Name = "_4";
+            _4.Size = new System.Drawing.Size(207, 6);
+            // 
+            // _1
+            // 
+            _1.Name = "_1";
+            _1.Size = new System.Drawing.Size(207, 6);
+            // 
+            // _2
+            // 
+            _2.Name = "_2";
+            _2.Size = new System.Drawing.Size(207, 6);
+            // 
+            // _3
+            // 
+            _3.Name = "_3";
+            _3.Size = new System.Drawing.Size(207, 6);
             // 
             // notifyIcon1
             // 
@@ -66,47 +86,35 @@
             this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsm_Open,
-            this.toolStripSeparator3,
-            this.tsm_IsDisableShortcutKey,
-            this.toolStripSeparator2,
+            _1,
+            this.tsm_Reload,
+            _2,
             this.tscb_DefaultList,
             this.tsm_Mini,
             this.tsm_Boot,
-            toolStripSeparator1,
+            _3,
+            this.tsm_IsDisableShortcutKey,
+            _4,
             this.tsm_Exit});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowCheckMargin = true;
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(198, 174);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(211, 232);
             // 
             // tsm_Open
             // 
             this.tsm_Open.Name = "tsm_Open";
             this.tsm_Open.ShortcutKeyDisplayString = "Ctrl+Alt+D";
-            this.tsm_Open.Size = new System.Drawing.Size(197, 24);
+            this.tsm_Open.Size = new System.Drawing.Size(210, 24);
             this.tsm_Open.Text = "打开";
             this.tsm_Open.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LeftClickToShow);
             // 
-            // toolStripSeparator3
+            // tsm_Reload
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(194, 6);
-            // 
-            // tsm_IsDisableShortcutKey
-            // 
-            this.tsm_IsDisableShortcutKey.Checked = global::DiDa_List_PC.Properties.Settings.Default.IsSetShortcutKey;
-            this.tsm_IsDisableShortcutKey.CheckOnClick = true;
-            this.tsm_IsDisableShortcutKey.Name = "tsm_IsDisableShortcutKey";
-            this.tsm_IsDisableShortcutKey.ShortcutKeyDisplayString = "";
-            this.tsm_IsDisableShortcutKey.ShowShortcutKeys = false;
-            this.tsm_IsDisableShortcutKey.Size = new System.Drawing.Size(197, 24);
-            this.tsm_IsDisableShortcutKey.Text = "禁用快捷键";
-            this.tsm_IsDisableShortcutKey.CheckedChanged += new System.EventHandler(this.Tsm_IsDisableShortcutKey_CheckedChanged);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(194, 6);
+            this.tsm_Reload.Name = "tsm_Reload";
+            this.tsm_Reload.Size = new System.Drawing.Size(210, 24);
+            this.tsm_Reload.Text = "刷新页面";
+            this.tsm_Reload.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Tsm_Reload_MouseUp);
             // 
             // tscb_DefaultList
             // 
@@ -126,7 +134,7 @@
             this.tsm_Mini.CheckOnClick = true;
             this.tsm_Mini.Name = "tsm_Mini";
             this.tsm_Mini.ShowShortcutKeys = false;
-            this.tsm_Mini.Size = new System.Drawing.Size(197, 24);
+            this.tsm_Mini.Size = new System.Drawing.Size(210, 24);
             this.tsm_Mini.Text = "Mini模式";
             this.tsm_Mini.CheckedChanged += new System.EventHandler(this.Tsm_test_CheckedChanged);
             // 
@@ -136,15 +144,26 @@
             this.tsm_Boot.CheckOnClick = true;
             this.tsm_Boot.Name = "tsm_Boot";
             this.tsm_Boot.ShowShortcutKeys = false;
-            this.tsm_Boot.Size = new System.Drawing.Size(197, 24);
+            this.tsm_Boot.Size = new System.Drawing.Size(210, 24);
             this.tsm_Boot.Text = "开机启动";
             this.tsm_Boot.CheckedChanged += new System.EventHandler(this.ToolStripMenuItem2_CheckedChanged);
+            // 
+            // tsm_IsDisableShortcutKey
+            // 
+            this.tsm_IsDisableShortcutKey.Checked = global::DiDa_List_PC.Properties.Settings.Default.IsSetShortcutKey;
+            this.tsm_IsDisableShortcutKey.CheckOnClick = true;
+            this.tsm_IsDisableShortcutKey.Name = "tsm_IsDisableShortcutKey";
+            this.tsm_IsDisableShortcutKey.ShortcutKeyDisplayString = "";
+            this.tsm_IsDisableShortcutKey.ShowShortcutKeys = false;
+            this.tsm_IsDisableShortcutKey.Size = new System.Drawing.Size(210, 24);
+            this.tsm_IsDisableShortcutKey.Text = "禁用快捷键";
+            this.tsm_IsDisableShortcutKey.CheckedChanged += new System.EventHandler(this.Tsm_IsDisableShortcutKey_CheckedChanged);
             // 
             // tsm_Exit
             // 
             this.tsm_Exit.Name = "tsm_Exit";
             this.tsm_Exit.ShowShortcutKeys = false;
-            this.tsm_Exit.Size = new System.Drawing.Size(197, 24);
+            this.tsm_Exit.Size = new System.Drawing.Size(210, 24);
             this.tsm_Exit.Text = "退出";
             this.tsm_Exit.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MouseUpToExit);
             // 
@@ -157,9 +176,9 @@
             // 
             this.t_AutoSideHideOrShow.Enabled = global::DiDa_List_PC.Properties.Settings.Default.HideEdgeValue;
             this.t_AutoSideHideOrShow.Interval = global::DiDa_List_PC.Properties.Settings.Default.Timer_AutoSideHide_Interval;
-            this.t_AutoSideHideOrShow.Tick += new System.EventHandler(this.T_AutoSideHideOrShow_Tick);
+            this.t_AutoSideHideOrShow.Tick += new System.EventHandler(this.AutoSideHideOrShow_Tick);
             // 
-            // Form_Main
+            // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -197,9 +216,8 @@
         private System.Windows.Forms.ToolStripComboBox tscb_DefaultList;
         private System.Windows.Forms.ToolStripMenuItem tsm_Mini;
         private System.Windows.Forms.Timer t_AutoSideHideOrShow;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem tsm_IsDisableShortcutKey;
+        private System.Windows.Forms.ToolStripMenuItem tsm_Reload;
     }
 }
 

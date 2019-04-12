@@ -27,12 +27,13 @@ namespace DiDa_List_PC
     {
         #region 属性/字段
 
-        private const int ShortcutKeyId = 100;
-        private readonly string[] _starArgs;
-        private ChromiumWebBrowser _browser;
-        private bool _isWindowActivate;
-        private string _startUrl = string.Empty;
-        private List<TaskData> _historyTasks = new List<TaskData>
+        private const int SHORTCUTKEY_ID = 100;
+
+        public string[] StarArgs { get; }
+        public bool IsWindowActivate { get; private set; }
+        public ChromiumWebBrowser Browser { get; private set; }
+        public string StartUrl { get; private set; }
+        public List<TaskData> HistoryTasks { get; private set; } = new List<TaskData>
         {
             new TaskData
             {
@@ -51,8 +52,8 @@ namespace DiDa_List_PC
             DisableDuplicateStartup();
             InitializeComponent();
             SetControlValue(Settings.Default);
-            InitializeCefSharp(_startUrl);
-            _starArgs = args;
+            InitializeCefSharp(StartUrl);
+            StarArgs = args;
         }
 
         /// <summary>
@@ -70,15 +71,15 @@ namespace DiDa_List_PC
             Cef.Initialize(settings);
 
             // 初始化浏览器
-            _browser = new ChromiumWebBrowser(url)
+            Browser = new ChromiumWebBrowser(url)
             {
                 MenuHandler = new MenuHandler(),
                 DragHandler = new DragHandler()
             };
-            Controls.Add(_browser);
+            Controls.Add(Browser);
 
             //加载完成后事件
-            _browser.FrameLoadEnd += Browser_FrameLoadEnd;
+            Browser.FrameLoadEnd += Browser_FrameLoadEnd;
         }
 
         private static List<TaskData> GetTaskDatas(string html)
@@ -142,7 +143,7 @@ namespace DiDa_List_PC
         {
             if (!isWindowActivate)
             {
-                _browser.ExecuteScriptAsync(Resources.Update_JS);
+                Browser.ExecuteScriptAsync(Resources.Update_JS);
             }
         }
 
@@ -257,16 +258,16 @@ namespace DiDa_List_PC
             switch (tscb_DefaultList.SelectedIndex)
             {
                 default:
-                    _startUrl = Resources.List_Tasks;
+                    StartUrl = Resources.List_Tasks;
                     break;
                 case 1:
-                    _startUrl = Resources.List_Today;
+                    StartUrl = Resources.List_Today;
                     break;
                 case 2:
-                    _startUrl = Resources.List_Tomorrow;
+                    StartUrl = Resources.List_Tomorrow;
                     break;
                 case 3:
-                    _startUrl = Resources.List_Week;
+                    StartUrl = Resources.List_Week;
                     break;
             }
 
@@ -301,11 +302,11 @@ namespace DiDa_List_PC
         {
             if (isEnable)
             {
-                HotKey.RegisterHotKey(Handle, ShortcutKeyId, HotKey.KeyModifiers.Ctrl | HotKey.KeyModifiers.Alt, Keys.D);
+                HotKey.RegisterHotKey(Handle, SHORTCUTKEY_ID, HotKey.KeyModifiers.Ctrl | HotKey.KeyModifiers.Alt, Keys.D);
             }
             else
             {
-                HotKey.UnregisteredHotKey(Handle, ShortcutKeyId);
+                HotKey.UnregisteredHotKey(Handle, SHORTCUTKEY_ID);
             }
         }
 
@@ -317,9 +318,9 @@ namespace DiDa_List_PC
         protected override void WndProc(ref Message m)
         {
             const int hotKey = 0x0312;
-            if (m.Msg == hotKey || m.HWnd.ToInt32() == ShortcutKeyId)
+            if (m.Msg == hotKey || m.HWnd.ToInt32() == SHORTCUTKEY_ID)
             {
-                SetShowOrHideWindow(!_isWindowActivate);
+                SetShowOrHideWindow(!IsWindowActivate);
             }
             base.WndProc(ref m);
         }
@@ -389,16 +390,30 @@ namespace DiDa_List_PC
 
         private void Form_Main_Shown(object sender, EventArgs e)
         {
-            SetMinStar(_starArgs);
+            SetMinStar(StarArgs);
         }
 
-        private async void Timer1_Tick(object sender, EventArgs e)
+        private void Form1_Activated(object sender, EventArgs e)
         {
-            // 任务通知
-            var newTaskDatas = GetTaskDatas(await _browser.GetSourceAsync());
-            _historyTasks = EqualsTasks(newTaskDatas, _historyTasks, 60);
+            IsWindowActivate = true;
+        }
 
-            UpdateData(_isWindowActivate);
+        private void Form1_Deactivate(object sender, EventArgs e)
+        {
+            IsWindowActivate = false;
+        }
+
+        private void Form_Main_ResizeEnd(object sender, EventArgs e)
+        {
+            if (tsm_Mini.Checked)
+            {
+                Settings.Default.WindowSize_Mini = Size;
+            }
+            else
+            {
+                Settings.Default.WindowSize = Size;
+            }
+            Settings.Default.Save();
         }
 
         private void Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
@@ -426,16 +441,6 @@ namespace DiDa_List_PC
             Application.Exit();
         }
 
-        private void Form1_Activated(object sender, EventArgs e)
-        {
-            _isWindowActivate = true;
-        }
-
-        private void Form1_Deactivate(object sender, EventArgs e)
-        {
-            _isWindowActivate = false;
-        }
-
         private void ToolStripMenuItem2_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Default.BootValue = tsm_Boot.Checked;
@@ -449,17 +454,18 @@ namespace DiDa_List_PC
             Settings.Default.Save();
         }
 
-        private void Form_Main_ResizeEnd(object sender, EventArgs e)
+        private async void Timer1_Tick(object sender, EventArgs e)
         {
-            if (tsm_Mini.Checked)
-            {
-                Settings.Default.WindowSize_Mini = Size;
-            }
-            else
-            {
-                Settings.Default.WindowSize = Size;
-            }
-            Settings.Default.Save();
+            // 任务通知
+            var newTaskDatas = GetTaskDatas(await Browser.GetSourceAsync());
+            HistoryTasks = EqualsTasks(newTaskDatas, HistoryTasks, 60);
+
+            UpdateData(IsWindowActivate);
+        }
+
+        private void AutoSideHideOrShow_Tick(object sender, EventArgs e)
+        {
+            SideHideOrShow(Settings.Default.SideThicknessValue);
         }
 
         private void Tsm_test_CheckedChanged(object sender, EventArgs e)
@@ -469,28 +475,29 @@ namespace DiDa_List_PC
             Application.Restart();
         }
 
-        private void T_AutoSideHideOrShow_Tick(object sender, EventArgs e)
-        {
-            SideHideOrShow(Settings.Default.SideThicknessValue);
-        }
-
         private void Tsm_IsDisableShortcutKey_CheckedChanged(object sender, EventArgs e)
         {
             // 是否禁用全局快捷键
             SetShortcutKey(!tsm_IsDisableShortcutKey.Checked);
         }
 
+        private void Tsm_Reload_MouseUp(object sender, MouseEventArgs e)
+        {
+            Browser.GetBrowser().Reload();
+        }
+
         #endregion
 
-        /// <summary>
-        /// 任务数据
-        /// </summary>
-        private struct TaskData
-        {
-            public string Title;
-            public string Content;
-            public DateTime DateTime;
-        }
+    }
+
+    /// <summary>
+    /// 任务数据
+    /// </summary>
+    public struct TaskData
+    {
+        public string Title;
+        public string Content;
+        public DateTime DateTime;
     }
 
     /// <inheritdoc />
