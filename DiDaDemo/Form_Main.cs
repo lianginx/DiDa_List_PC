@@ -33,15 +33,7 @@ namespace DiDa_List_PC
         public bool IsWindowActivate { get; private set; }
         public ChromiumWebBrowser Browser { get; private set; }
         public string StartUrl { get; private set; }
-        public List<TaskData> HistoryTasks { get; private set; } = new List<TaskData>
-        {
-            new TaskData
-            {
-                Title = string.Empty,
-                Content = string.Empty,
-                DateTime = DateTime.Now
-            }
-        };
+        public List<TaskData> HistoryTasks { get; private set; }
 
         #endregion
 
@@ -97,15 +89,14 @@ namespace DiDa_List_PC
             foreach (var node in nodes)
             {
                 var xpath = node.XPath;
-                var title = node.SelectSingleNode($"{xpath}{taskXPath}").InnerText;
-                var content = node.SelectSingleNode($"{xpath}{contentXPath}").InnerText;
                 tasks.Add(new TaskData
                 {
-                    Title = title,
-                    Content = content,
+                    Title = node.SelectSingleNode($"{xpath}{taskXPath}").InnerText,
+                    Content = node.SelectSingleNode($"{xpath}{contentXPath}").InnerText,
                     DateTime = DateTime.Now
                 });
             }
+
             return tasks;
         }
 
@@ -120,17 +111,42 @@ namespace DiDa_List_PC
         {
             if (newTasks == null) return oldTasks;
 
+            if (oldTasks == null)
+            {
+                foreach (var item in newTasks)
+                {
+                    notifyIcon1.ShowBalloonTip(0,
+                                               item.Title,
+                                               item.Content == "" ? item.Title : item.Content,
+                                               ToolTipIcon.Info);
+                }
+
+                return newTasks;
+            }
+
             var trigger = false;
             foreach (var newD in newTasks)
             {
                 foreach (var oldD in oldTasks)
                 {
-                    if (newD.Title == oldD.Title && newD.Content == oldD.Content &&
-                        !((newD.DateTime - oldD.DateTime).TotalSeconds > tick)) continue;
-                    notifyIcon1.ShowBalloonTip(3000, newD.Title, newD.Content == "" ? newD.Title : newD.Content, ToolTipIcon.Info);
-                    trigger = true;
+                    if (newD.Title != oldD.Title && newD.Content != oldD.Content) continue;
+
+                    if (!((newD.DateTime - oldD.DateTime).TotalSeconds > tick))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        notifyIcon1.ShowBalloonTip(0,
+                                                   newD.Title,
+                                                   newD.Content == "" ? newD.Title : newD.Content,
+                                                   ToolTipIcon.Info);
+                        trigger = true;
+                        break;
+                    }
                 }
             }
+
             return trigger ? newTasks : oldTasks;
         }
 
