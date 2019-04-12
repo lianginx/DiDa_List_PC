@@ -55,22 +55,22 @@
             // _4
             // 
             _4.Name = "_4";
-            _4.Size = new System.Drawing.Size(207, 6);
+            _4.Size = new System.Drawing.Size(194, 6);
             // 
             // _1
             // 
             _1.Name = "_1";
-            _1.Size = new System.Drawing.Size(207, 6);
+            _1.Size = new System.Drawing.Size(194, 6);
             // 
             // _2
             // 
             _2.Name = "_2";
-            _2.Size = new System.Drawing.Size(207, 6);
+            _2.Size = new System.Drawing.Size(194, 6);
             // 
             // _3
             // 
             _3.Name = "_3";
-            _3.Size = new System.Drawing.Size(207, 6);
+            _3.Size = new System.Drawing.Size(194, 6);
             // 
             // notifyIcon1
             // 
@@ -99,20 +99,20 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowCheckMargin = true;
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(211, 232);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(198, 204);
             // 
             // tsm_Open
             // 
             this.tsm_Open.Name = "tsm_Open";
             this.tsm_Open.ShortcutKeyDisplayString = "Ctrl+Alt+D";
-            this.tsm_Open.Size = new System.Drawing.Size(210, 24);
+            this.tsm_Open.Size = new System.Drawing.Size(197, 24);
             this.tsm_Open.Text = "打开";
             this.tsm_Open.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LeftClickToShow);
             // 
             // tsm_Reload
             // 
             this.tsm_Reload.Name = "tsm_Reload";
-            this.tsm_Reload.Size = new System.Drawing.Size(210, 24);
+            this.tsm_Reload.Size = new System.Drawing.Size(197, 24);
             this.tsm_Reload.Text = "刷新页面";
             this.tsm_Reload.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Tsm_Reload_MouseUp);
             // 
@@ -134,7 +134,7 @@
             this.tsm_Mini.CheckOnClick = true;
             this.tsm_Mini.Name = "tsm_Mini";
             this.tsm_Mini.ShowShortcutKeys = false;
-            this.tsm_Mini.Size = new System.Drawing.Size(210, 24);
+            this.tsm_Mini.Size = new System.Drawing.Size(197, 24);
             this.tsm_Mini.Text = "Mini模式";
             this.tsm_Mini.CheckedChanged += new System.EventHandler(this.Tsm_test_CheckedChanged);
             // 
@@ -144,7 +144,7 @@
             this.tsm_Boot.CheckOnClick = true;
             this.tsm_Boot.Name = "tsm_Boot";
             this.tsm_Boot.ShowShortcutKeys = false;
-            this.tsm_Boot.Size = new System.Drawing.Size(210, 24);
+            this.tsm_Boot.Size = new System.Drawing.Size(197, 24);
             this.tsm_Boot.Text = "开机启动";
             this.tsm_Boot.CheckedChanged += new System.EventHandler(this.ToolStripMenuItem2_CheckedChanged);
             // 
@@ -155,7 +155,7 @@
             this.tsm_IsDisableShortcutKey.Name = "tsm_IsDisableShortcutKey";
             this.tsm_IsDisableShortcutKey.ShortcutKeyDisplayString = "";
             this.tsm_IsDisableShortcutKey.ShowShortcutKeys = false;
-            this.tsm_IsDisableShortcutKey.Size = new System.Drawing.Size(210, 24);
+            this.tsm_IsDisableShortcutKey.Size = new System.Drawing.Size(197, 24);
             this.tsm_IsDisableShortcutKey.Text = "禁用快捷键";
             this.tsm_IsDisableShortcutKey.CheckedChanged += new System.EventHandler(this.Tsm_IsDisableShortcutKey_CheckedChanged);
             // 
@@ -163,7 +163,7 @@
             // 
             this.tsm_Exit.Name = "tsm_Exit";
             this.tsm_Exit.ShowShortcutKeys = false;
-            this.tsm_Exit.Size = new System.Drawing.Size(210, 24);
+            this.tsm_Exit.Size = new System.Drawing.Size(197, 24);
             this.tsm_Exit.Text = "退出";
             this.tsm_Exit.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MouseUpToExit);
             // 
